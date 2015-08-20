@@ -114,6 +114,6 @@ class FaceInteraction(object):
 
 
 if __name__ == "__main__":
-    demo = FaceInteraction(10, 'nwad')
+    demo = FaceInteraction(10, 'nwad')  # 10 people at most, 'nwad' is the name of the folder the program uses
     demo.predict_on_video()
     # demo.predict_on_video()
