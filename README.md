@@ -3,7 +3,8 @@
 [face_recognizer.py]
 1)创建csv文件
 read_csv(filename, images, labels, labelsInfo, sep=';')
-文件格式为 <path>;<label>[;<comment>]\n  用于创建人脸识别器时提供图片的标签以及图片文件的路径
+文件格式为，用于创建人脸识别器时提供图片的标签以及图片文件的路径
+<path>;<label>[;<comment>]\n  
 
 2)训练分类器
 train(csv_file, filenameTosave=TRAIN_RESUT)
@@ -34,6 +35,7 @@ record_face(amount=-1, dirname=None)
 拍摄amount张图片(内部调用了 any_faces())，若检测到人脸则自动存储照片到dirname文件夹中
 
 [face_interaction.py]
+
 对上述两个模块进行简单的应用。
     demo = FaceInteraction(10, 'nwad')  # 10 people at most, 'nwad' is the name of the folder the program uses
     demo.predict_on_video()  # or demo.train()
