@@ -1,4 +1,15 @@
-﻿data/	# 一些测试数据
-start.bat	# windows下两个版本的python启动起来很麻烦
-createCSV.py		# 由opencv教程提供的一个脚本
+﻿# 注意注释不能和要ignore的文件名写在同一行
 
+# 一些测试数据
+data/
+
+# windows下两个版本的python启动起来很麻烦
+start.bat
+
+# 由opencv教程提供的一个脚本
+createCSV.py
+
+# train_data
+nwad/
+
+*.pyc

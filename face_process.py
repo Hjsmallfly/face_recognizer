@@ -7,6 +7,10 @@ import time
 Face_Cascade = cv2.CascadeClassifier("haarcascades/haarcascade_frontalface_alt.xml")
 Eye_Cascade = cv2.CascadeClassifier("haarcascades/haarcascade_eye.xml")
 Eye_With_Glass_Cascade = cv2.CascadeClassifier("haarcascades/haarcascade_eye_tree_eyeglasses.xml")
+Nose_Cascade = cv2.CascadeClassifier("haarcascades/haarcascade_mcs_nose.xml")
+
+EYES = 0    # use to determine whether the face is true face
+NOSE = 1
 
 
 def widthHeightDivideBy(image, divisor):
@@ -58,18 +62,34 @@ def showDebugImg(img, area=None):
         cv2.waitKey(0)
 
 
-def any_faces(image):
-    faces = detect_obj(image, Face_Cascade, imageSizeToMinSizeRatio=8)
+def any_faces(image, addition=EYES):
+    """
+    :param image: detect on this pictures
+    :param addition: choose which part to determine whether the face is true
+    :return: list of faces rectangle (x, y, w, h)
+    """
+    imgSizeToMinSizeRation = 8
+    faces = detect_obj(image, Face_Cascade, imageSizeToMinSizeRatio=imgSizeToMinSizeRation)
     result = []
     for face in faces:
         # showDebugImg(image, face)
         x, y, w, h = face
-        upper_face = x, y, w, h / 2
-        eyes = detect_obj(image, Eye_Cascade, upper_face, imageSizeToMinSizeRatio=64)
-
-        if len(eyes) == 0:
-            eyes = detect_obj(image, Eye_With_Glass_Cascade, upper_face, imageSizeToMinSizeRatio=64)
-        if len(eyes) != 0:  # can't find eyes
+        if addition == EYES:
+            imgSizeToMinSizeRation = 64 # don't need to detect via any sizes
+            face_roi = x, y, w, h / 2   # shrink the roi to detect eyes
+            cascade = Eye_Cascade
+        elif addition == NOSE:
+            # print "detect using nose"
+            imgSizeToMinSizeRation = 32
+            face_roi = x + w / 4, y + h / 4, w / 2, h / 2    # shrink the roi to detect nose in the mid part
+            cascade = Nose_Cascade
+        else:
+            print "addition doesn't match any constant"
+            return []   # empty
+        obj_rects = detect_obj(image, cascade, face_roi, imageSizeToMinSizeRatio=imgSizeToMinSizeRation)
+        if len(obj_rects) == 0 and addition == EYES:    # eyes with glasses
+            obj_rects = detect_obj(image, Eye_With_Glass_Cascade, face_roi, imageSizeToMinSizeRatio=imgSizeToMinSizeRation)
+        if len(obj_rects) != 0:  # can't find obj_rects
             result.append(face)
     # for face in result:
     #     showDebugImg(image, face)
@@ -82,7 +102,7 @@ def getRect(image, area):
 
 
 def cropFaces(image, size=(100, 100), grayscale=False):
-    faces = any_faces(image)
+    faces = any_faces(image, NOSE)
     face_rois = []
     for area in faces:
         face = getRect(image, area)
@@ -150,7 +170,7 @@ def record_face(amount=-1, dirname=None):
             frame = cv2.flip(frame, 1)
             cv2.imshow('', frame)
             if interval % 10 == 0:
-                faces = any_faces(frame)
+                faces = any_faces(frame, NOSE)  # use NODE part to determine
                 if len(faces) != 0:
                     cv2.imwrite(dirname + os.path.sep + 'record_' + str(count) + '.jpg', frame)
                     outline(frame, faces[0])

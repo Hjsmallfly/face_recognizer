@@ -73,11 +73,12 @@ class FaceInteraction(object):
                     face = face_imgs[0]     # now just consider one person
                     face_coord = face_coords[0]
                     name, confidence = self.predict(face)
-                    if confidence <= 90:
+                    if confidence <= 80:
                         print "I guess you are ", name, "^_^", confidence
                         x, y = face_coord[:2]
                         face_process.drawText(frame, name, (x, y - 30))
                     else:
+                        face_process.drawText(frame, "Nobody", (x, y - 30))
                         print "I'm sorry! I guess I don't know you...But we can be friends~"
             cv2.imshow(self.instance_name, frame)
             key = cv2.waitKey(50)
@@ -115,5 +116,5 @@ class FaceInteraction(object):
 
 if __name__ == "__main__":
     demo = FaceInteraction(10, 'nwad')  # 10 people at most, 'nwad' is the name of the folder the program uses
-    demo.predict_on_video()
+    demo.train()
     # demo.predict_on_video()
