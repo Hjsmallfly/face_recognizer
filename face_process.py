@@ -96,16 +96,23 @@ def any_faces(image, addition=EYES):
     return result
 
 
-def getRect(image, area):
+def getSubImg(image, area):
     x, y, w, h = area
     return image[y: y + h, x: x + w]
 
 
 def cropFaces(image, size=(100, 100), grayscale=False):
+    """
+    use any_faces to get the faces coordiantes, return list(faceImgs), list(coordinates)
+    :param image:
+    :param size:
+    :param grayscale:
+    :return:
+    """
     faces = any_faces(image, NOSE)
     face_rois = []
     for area in faces:
-        face = getRect(image, area)
+        face = getSubImg(image, area)
         face = cv2.resize(face, size, interpolation=cv2.INTER_CUBIC)
         if grayscale:
             face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
@@ -169,11 +176,12 @@ def record_face(amount=-1, dirname=None):
         if ret_val:
             frame = cv2.flip(frame, 1)
             cv2.imshow('', frame)
-            if interval % 10 == 0:
-                faces = any_faces(frame, NOSE)  # use NODE part to determine
-                if len(faces) != 0:
-                    cv2.imwrite(dirname + os.path.sep + 'record_' + str(count) + '.jpg', frame)
-                    outline(frame, faces[0])
+            if interval % 5 == 0:   # faster capture
+                # face_imgs = any_faces(frame, NOSE)  # use NODE part to determine
+                face_imgs, face_coords = cropFaces(frame, grayscale=False)
+                if len(face_imgs) != 0:                                             # record single face
+                    cv2.imwrite(dirname + os.path.sep + 'record_' + str(count) + '.jpg', face_imgs[0])
+                    outline(frame, face_coords[0])
                     cv2.imshow('', frame)
                     print("capturing {}".format(count))
                     if amount != -1:

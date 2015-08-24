@@ -69,17 +69,18 @@ class FaceInteraction(object):
                     # outline each face detected
                     for face_area in face_coords:
                         face_process.outline(frame, face_area, (255, 0, 0))
-
-                    face = face_imgs[0]     # now just consider one person
-                    face_coord = face_coords[0]
-                    name, confidence = self.predict(face)
-                    x, y = face_coord[:2]
-                    if confidence <= 65:
-                        print "I guess you are ", name, "^_^", confidence
-                        face_process.drawText(frame, name, (x, y - 30))
-                    else:
-                        face_process.drawText(frame, "Nobody", (x, y - 30))
-                        print "I'm sorry! I guess I don't know you...But we can be friends~"
+                    index = 0
+                    for face in face_imgs:  # for every face in the picture
+                        face_coord = face_coords[index]
+                        ++index     # get the corresponding face_coord
+                        name, confidence = self.predict(face)
+                        x, y = face_coord[:2]
+                        if confidence <= 65:
+                            print "I guess you are ", name, "^_^", confidence
+                            face_process.drawText(frame, name, (x, y - 30))
+                        else:
+                            face_process.drawText(frame, "Nobody", (x, y - 30))
+                            print "I'm sorry! I guess I don't know you...But we can be friends~"
             cv2.imshow(self.instance_name, frame)
             key = cv2.waitKey(50)
             if key == ord('q'):
@@ -98,12 +99,12 @@ class FaceInteraction(object):
         # update the persons
         with open(self.person_data, 'wb') as f:
             pickle.dump(self.person_set, f)
-        print "start recording your faces~~~~"
+        print "start recording your face~~~~"
         count = FaceInteraction.Capture_count
         face_process.record_face(count, self.dirname + name)
         print 'recording ends.{} photos of you are token~'.format(count)
-        print 'get all the faces from the pictures~~~'
-        self.get_faces(name)
+        print 'get all the faces'
+        # self.get_faces(name)
         print 'start creating csv file for you~'
         csv = face_recognizer.creat_csv(self.dirname, commentNamedByFolderName=True)
         # print csv
@@ -116,5 +117,6 @@ class FaceInteraction(object):
 
 if __name__ == "__main__":
     demo = FaceInteraction(10, 'nwad')  # 10 people at most, 'nwad' is the name of the folder the program uses
+    # demo.train()
     demo.predict_on_video()
     # demo.predict_on_video()

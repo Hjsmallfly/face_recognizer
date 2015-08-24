@@ -60,7 +60,7 @@ def read_csv(filename, images, labels, labelsInfo, sep=';'):
             # 'path' can be file, dir or wildcard path
             files = glob.glob(path)
             for each_file in files:
-                img = cv2.imread(each_file, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+                img = cv2.imread(each_file, cv2.CV_LOAD_IMAGE_GRAYSCALE)    # grayscale pictures
                 assert isinstance(img, numpy.ndarray)
                 height, width = img.shape[:2]
                 if width < 50 or height < 50:
